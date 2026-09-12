@@ -1,0 +1,35 @@
+// 3198
+
+
+#include "Character/AuraCharacter.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+
+AAuraCharacter::AAuraCharacter()
+{
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
+	SpringArmComp->SetupAttachment(GetMesh());
+	SpringArmComp->TargetArmLength = 800.0f;
+	SpringArmComp->bEnableCameraLag = true;
+	SpringArmComp->bUsePawnControlRotation = false;
+	SpringArmComp->bInheritPitch = false;
+	SpringArmComp->bInheritRoll = false;
+	SpringArmComp->bInheritYaw = false;
+	
+	CameraComp = CreateDefaultSubobject<UCameraComponent>("Camera");
+	CameraComp->SetupAttachment(SpringArmComp);
+	CameraComp->bUsePawnControlRotation = false;
+	
+	//顶视游戏的常见参数
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 300.0f, 0.0f);
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	
+	
+}
