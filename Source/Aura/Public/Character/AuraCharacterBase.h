@@ -30,6 +30,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 	
+	virtual void InitAbilityActorInfo();
+	
 	//敌人类里进行构造
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
