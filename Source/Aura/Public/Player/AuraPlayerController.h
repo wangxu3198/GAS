@@ -39,9 +39,8 @@ private:
 	
 	void CursorTrace();
 	
-	UPROPERTY()
-	TObjectPtr<IEnemyInterface> LastActor;
-	UPROPERTY()
-	TObjectPtr<IEnemyInterface> CurrentActor;
+	UPROPERTY(VisibleAnywhere, Category = "Input")
+	TScriptInterface<IEnemyInterface> LastActor;
+	TScriptInterface<IEnemyInterface> CurrentActor;
 	
 };

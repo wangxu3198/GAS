@@ -75,7 +75,9 @@ void AAuraPlayerController::CursorTrace()
 	
 	if (CursorHit.GetActor()->Implements<UEnemyInterface>())
 	{
-		CurrentActor = Cast<IEnemyInterface>(CursorHit.GetActor());
+		//Cast 返回的是 IEnemyInterface*（原生接口指针），不能直接赋值给 TScriptInterface。
+		CurrentActor = TScriptInterface<IEnemyInterface>(CursorHit.GetActor());
+		
 	}else
 	{
 		CurrentActor = nullptr;
