@@ -53,6 +53,8 @@ struct FEffectProperties
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+DECLARE_DELEGATE_RetVal(FGameplayAttribute, FAttributeSignature);
+
 UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet
 {
@@ -60,6 +62,8 @@ class AURA_API UAuraAttributeSet : public UAttributeSet
 	
 public:
 	UAuraAttributeSet();
+	
+	TMap<FGameplayTag, FAttributeSignature> TagsToAttributes;
 	
 	/*
 	 * Primary Attributes
