@@ -15,11 +15,14 @@ UAuraAttributeSet::UAuraAttributeSet()
 	const FAuraGameplayTags& GetGameplayTags = FAuraGameplayTags::Get();
 	
 	// StrengthDelegate.BindStatic(GetStrengthAttribute);
+	
+	/* Primary Attributes */
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Primary_Strength, GetStrengthAttribute);
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute);
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Primary_Resilience, GetResilienceAttribute);
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Primary_Vigor, GetVigorAttribute);
 	
+	/* Secondary Attributes */
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Secondary_Armor, GetArmorAttribute);
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Secondary_ArmorPenetration, GetArmorPenetrationAttribute);
 	TagsToAttributes.Add(GetGameplayTags.Attributes_Secondary_BlockChance, GetBlockChanceAttribute);
