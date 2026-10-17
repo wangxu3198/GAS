@@ -52,8 +52,11 @@ struct FEffectProperties
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
-
-DECLARE_DELEGATE_RetVal(FGameplayAttribute, FAttributeSignature);
+// typedef is specific to the FGameplayAttribute() signature, but TStaticFunPtr is generic to any signature
+// DECLARE_DELEGATE_RetVal(FGameplayAttribute, FAttributeSignature);
+//typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+template<class T>//静态函数的，因为成员函数要对象。此时用其他类似TBaseStaticDelegateInstance类
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
 
 UCLASS()
 class AURA_API UAuraAttributeSet : public UAttributeSet
@@ -63,7 +66,7 @@ class AURA_API UAuraAttributeSet : public UAttributeSet
 public:
 	UAuraAttributeSet();
 	
-	TMap<FGameplayTag, FAttributeSignature> TagsToAttributes;
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 	
 	/*
 	 * Primary Attributes
