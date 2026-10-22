@@ -2,8 +2,9 @@
 
 
 #include "Player/AuraPlayerController.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameplayTagContainer.h"
+#include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 AAuraPlayerController::AAuraPlayerController()
@@ -43,8 +44,22 @@ void AAuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
+	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	
+	/*
+	 * 因为C++的模板实参推导机制，所以不用<>
+	 * 前提条件：在C++中，通常编译器可以自动推导模板类型。但在以下两种情况下，必须手动（显式）指定类型：
+	 * 
+	 * 1. 类型未出现在参数列表：模板参数没有作为函数参数传入（编译器无从推导）。
+	 * 2. 存在二义性：编译器无法唯一确定要使用的类型。
+	 * 
+	 * 代码示例解析：
+	 * 定义了一个模板函数 template<typename T> T GetDefaultValue()。
+	 * 因为该函数的参数列表 () 是空的，没有传入任何参数，编译器无法推导 T 是什么类型。
+	 * 因此，在调用时必须显式指定（如 GetDefaultValue<int>()），否则会报错。
+	 */
+	AuraInputComponent->BindAbilityActions(InputConfig, this, &AAuraPlayerController::AbilityInputTagPressed, &AAuraPlayerController::AbilityInputTagReleased, &AAuraPlayerController::AbilityInputTagHeld);
 	
 }
 
@@ -120,4 +135,19 @@ void AAuraPlayerController::CursorTrace()
 	{
 		// E. Both actors are valid, and are the same actor - Do nothing
 	}
+}
+
+void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	
+}
+
+void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	
+}
+
+void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	
 }

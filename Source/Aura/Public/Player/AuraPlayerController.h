@@ -10,6 +10,8 @@ class IEnemyInterface;
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
+class UAuraInputConfig;
+struct FGameplayTag;
 /**
  * 
  */
@@ -42,5 +44,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TScriptInterface<IEnemyInterface> LastActor;
 	TScriptInterface<IEnemyInterface> CurrentActor;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UAuraInputConfig> InputConfig;
+	
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
 	
 };
