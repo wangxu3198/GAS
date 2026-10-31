@@ -20,7 +20,15 @@ void UTargetDataUnderMouse::Activate()
 	}
 	else
 	{
-		//TODO:We are on the server,so listen for target data.
+		const FGameplayAbilitySpecHandle SpecHandle = GetAbilitySpecHandle();
+		const FPredictionKey ActivationPredictionKey = GetActivationPredictionKey();
+		AbilitySystemComponent.Get()->AbilityTargetDataSetDelegate(SpecHandle, ActivationPredictionKey).AddUObject(this, &UTargetDataUnderMouse::OnTargetDataReplicatedCallback);
+		const bool bCalledDelegate = AbilitySystemComponent.Get()->CallReplicatedTargetDataDelegatesIfSet(SpecHandle, ActivationPredictionKey);
+		if (!bCalledDelegate)
+		{
+			//当前这个 AbilityTask 正在等待远程玩家（客户端）的数据，暂时挂起。数据到了后台会自动广播，这个函数只是等待
+			SetWaitingOnRemotePlayerData();
+		}
 	}
 }
 
@@ -52,15 +60,24 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	 * 以下操作将带着刚才的预测 Key 发送给服务器 
 	 * 服务器从包里拿出了这个 FPredictionKey。
 	 * 服务器在自己的 ASC 里临时创建一个属于服务器的 FScopedPredictionWindow（注意，这里是拿着你传过来的 Key 去构造的）。
-	 * 用自己的代码重新执行 GA 逻辑：服务器收到 RPC（携带 Key 和技能句柄）后，会独立地在服务器上激活同一个 GA。这一步是服务器自己的代码在跑，不是客户端代码的远程复制。
-	 * 用 Key 标记服务器端产生的副作用：服务器在本地执行 GA 时，会用收到的 PredictionKey 构建一个预测窗口，把自己产生的 GameplayEffect、属性修改等副作用也绑定到这个 Key 上。
-	 * 校验并反馈：服务器根据自己的权威状态（真实蓝量、距离、冷却等）判断这次激活是否合法。合法则通过，不合法则拒绝。无论结果如何，服务器都会通过 RPC 或属性复制把结果传回客户端。
 	 */
 	AbilitySystemComponent->ServerSetReplicatedTargetData(GetAbilitySpecHandle(), 
 		GetActivationPredictionKey(), DataHandle, FGameplayTag(), 
 		AbilitySystemComponent->ScopedPredictionKey);
 	
 	// 某些情况不应该广播能力任务委托--可确保能力仍处于激活状态（能力处于激活状态时才能进行广播）
+	if (ShouldBroadcastAbilityTaskDelegates())
+	{
+		ValidData.Broadcast(DataHandle);
+	}
+}
+
+void UTargetDataUnderMouse::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle,
+	FGameplayTag ActivationTag)
+{
+	// 告知ASC该目标数据已消费完毕，主动释放其本地存储的缓存（Map），避免内存占用或数据复用。
+	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
+	
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		ValidData.Broadcast(DataHandle);
