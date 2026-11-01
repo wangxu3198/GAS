@@ -15,11 +15,6 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 
 void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
-	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
-	UE_LOG(LogTemp, Warning, TEXT("[SpawnProj] Time=%.3f | Role=%s | HasAuthority=%d | TargetLoc=%s"),
-		GetWorld()->GetTimeSeconds(), *UEnum::GetValueAsString(GetAvatarActorFromActorInfo()->GetLocalRole()),
-		GetAvatarActorFromActorInfo()->HasAuthority(), *ProjectileTargetLocation.ToString());
-	// ==== TEMP DEBUG END ====
 	//服务器端生成客户端复制
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;

@@ -14,10 +14,6 @@ UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGamepl
 void UTargetDataUnderMouse::Activate()
 {
 	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
-	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
-	UE_LOG(LogTemp, Warning, TEXT("[TDUM] Activate | Time=%.3f | Role=%s | bLocallyControlled=%d | ActPredKey=%d"),
-		GetWorld()->GetTimeSeconds(), *UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), bIsLocallyControlled, GetActivationPredictionKey().Current);
-	// ==== TEMP DEBUG END ====
 	if (bIsLocallyControlled)
 	{
 		SendMouseCursorData();
@@ -48,11 +44,6 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	FHitResult HitResult;
 	PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
-	UE_LOG(LogTemp, Warning, TEXT("[TDUM] SendMouseCursorData | Role=%s | bBlocking=%d | HitLoc=%s | HitActor=%s | ScopedPredKey=%d"),
-		*UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), HitResult.bBlockingHit, *HitResult.Location.ToString(),
-		HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("NONE"), AbilitySystemComponent->ScopedPredictionKey.Current);
-	// ==== TEMP DEBUG END ====
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
@@ -85,14 +76,6 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 void UTargetDataUnderMouse::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle,
 	FGameplayTag ActivationTag)
 {
-	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
-	if (const FGameplayAbilityTargetData_SingleTargetHit* TD = static_cast<const FGameplayAbilityTargetData_SingleTargetHit*>(DataHandle.Get(0)))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("[TDUM] OnTargetDataReplicatedCallback | Time=%.3f | Role=%s | bBlocking=%d | HitLoc=%s | HitActor=%s | ActPredKey=%d"),
-			GetWorld()->GetTimeSeconds(), *UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), TD->HitResult.bBlockingHit, *TD->HitResult.Location.ToString(),
-			TD->HitResult.GetActor() ? *TD->HitResult.GetActor()->GetName() : TEXT("NONE"), GetActivationPredictionKey().Current);
-	}
-	// ==== TEMP DEBUG END ====
 	// 告知ASC该目标数据已消费完毕，主动释放其本地存储的缓存（Map），避免内存占用或数据复用。
 	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
 

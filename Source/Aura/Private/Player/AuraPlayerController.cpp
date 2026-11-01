@@ -73,7 +73,8 @@ void AAuraPlayerController::SetupInputComponent()
 	
 	UAuraInputComponent* AuraInputComponent = CastChecked<UAuraInputComponent>(InputComponent);
 	AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
-	
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+	AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
 	/*
 	 * 因为C++的模板实参推导机制，所以不用<>
 	 * 前提条件：在C++中，通常编译器可以自动推导模板类型。但在以下两种情况下，必须手动（显式）指定类型：
@@ -174,11 +175,9 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 	
-	if (bTargeting)
-	{
-		if (GetASC()){GetASC()->AbilityInputTagReleased(InputTag);}
-	}
-	else
+	if (GetASC()){GetASC()->AbilityInputTagReleased(InputTag);}
+
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		APawn* ControllerPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControllerPawn)
@@ -211,7 +210,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 	
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC()){GetASC()->AbilityInputTagHeld(InputTag);}
 	}
