@@ -14,6 +14,10 @@ UTargetDataUnderMouse* UTargetDataUnderMouse::CreateTargetDataUnderMouse(UGamepl
 void UTargetDataUnderMouse::Activate()
 {
 	const bool bIsLocallyControlled = Ability->GetCurrentActorInfo()->IsLocallyControlled();
+	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
+	UE_LOG(LogTemp, Warning, TEXT("[TDUM] Activate | Time=%.3f | Role=%s | bLocallyControlled=%d | ActPredKey=%d"),
+		GetWorld()->GetTimeSeconds(), *UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), bIsLocallyControlled, GetActivationPredictionKey().Current);
+	// ==== TEMP DEBUG END ====
 	if (bIsLocallyControlled)
 	{
 		SendMouseCursorData();
@@ -44,7 +48,12 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	APlayerController* PC = Ability->GetCurrentActorInfo()->PlayerController.Get();
 	FHitResult HitResult;
 	PC->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-	
+	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
+	UE_LOG(LogTemp, Warning, TEXT("[TDUM] SendMouseCursorData | Role=%s | bBlocking=%d | HitLoc=%s | HitActor=%s | ScopedPredKey=%d"),
+		*UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), HitResult.bBlockingHit, *HitResult.Location.ToString(),
+		HitResult.GetActor() ? *HitResult.GetActor()->GetName() : TEXT("NONE"), AbilitySystemComponent->ScopedPredictionKey.Current);
+	// ==== TEMP DEBUG END ====
+
 	FGameplayAbilityTargetDataHandle DataHandle;
 	FGameplayAbilityTargetData_SingleTargetHit* Data = new FGameplayAbilityTargetData_SingleTargetHit();
 	Data->HitResult = HitResult;
@@ -60,6 +69,7 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 	 * 以下操作将带着刚才的预测 Key 发送给服务器 
 	 * 服务器从包里拿出了这个 FPredictionKey。
 	 * 服务器在自己的 ASC 里临时创建一个属于服务器的 FScopedPredictionWindow（注意，这里是拿着你传过来的 Key 去构造的）。
+	 * 把“客户端这次预测的编号”临时设为服务器当前的预测编号，让服务器在窗口内产出的权威结果能被客户端精确识别为“对同一次预测的答复”，从而完成对账与回滚。
 	 */
 	AbilitySystemComponent->ServerSetReplicatedTargetData(GetAbilitySpecHandle(), 
 		GetActivationPredictionKey(), DataHandle, FGameplayTag(), 
@@ -75,9 +85,17 @@ void UTargetDataUnderMouse::SendMouseCursorData()
 void UTargetDataUnderMouse::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle,
 	FGameplayTag ActivationTag)
 {
+	// ==== TEMP DEBUG (修复排查用，验证后删除) ====
+	if (const FGameplayAbilityTargetData_SingleTargetHit* TD = static_cast<const FGameplayAbilityTargetData_SingleTargetHit*>(DataHandle.Get(0)))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[TDUM] OnTargetDataReplicatedCallback | Time=%.3f | Role=%s | bBlocking=%d | HitLoc=%s | HitActor=%s | ActPredKey=%d"),
+			GetWorld()->GetTimeSeconds(), *UEnum::GetValueAsString(GetOwnerActor()->GetLocalRole()), TD->HitResult.bBlockingHit, *TD->HitResult.Location.ToString(),
+			TD->HitResult.GetActor() ? *TD->HitResult.GetActor()->GetName() : TEXT("NONE"), GetActivationPredictionKey().Current);
+	}
+	// ==== TEMP DEBUG END ====
 	// 告知ASC该目标数据已消费完毕，主动释放其本地存储的缓存（Map），避免内存占用或数据复用。
 	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
-	
+
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		ValidData.Broadcast(DataHandle);
