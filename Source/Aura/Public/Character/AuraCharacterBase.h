@@ -23,14 +23,21 @@ public:
 	// Sets default values for this character's properties
 	AAuraCharacterBase();
 	
+	/* --<IAbilitySystemInterface>-- */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	/* <IAbilitySystemInterface> */
+	
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 	
+	/* --<ICombatInterface>-- */
 	virtual int32 GetPlayerLevel() override;
+	/* <ICombatInterface> */
 
 protected:
 	// Called when the game starts or when spawned
+	/* --<AActor>-- */
 	virtual void BeginPlay() override;
+	/* <AActor> */
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
@@ -38,7 +45,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
 	
+	/* --<ICombatInterface>-- */
 	virtual FVector GetCombatSocketLocation() override;
+	/* <ICombatInterface> */
 	
 	virtual void InitAbilityActorInfo();
 	

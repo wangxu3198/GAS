@@ -144,15 +144,17 @@ public:
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
 	
 	
+	/* --<UAttributeSet>-- */
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
-	
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
-	
 	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
 	virtual void PostAttributeBaseChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) const override;
+	/* <UAttributeSet> */
 	
+	/* --<UObject>-- */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	/* <UObject> */
 	
 	
 	UFUNCTION()

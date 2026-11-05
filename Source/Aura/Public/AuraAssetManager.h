@@ -18,5 +18,7 @@ public:
 	static UAuraAssetManager& Get();
 protected:
 	//很早被调用，用于初始化
+	/* --<UAssetManager>-- */
 	virtual void StartInitialLoading() override;
+	/* <UAssetManager> */
 };

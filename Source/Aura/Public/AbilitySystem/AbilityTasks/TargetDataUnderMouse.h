@@ -24,7 +24,9 @@ public:
 	static UTargetDataUnderMouse* CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility);
 	
 private:
+	/* --<UGameplayTask>-- */
 	virtual void Activate() override;
+	/* <UGameplayTask> */
 	
 	void SendMouseCursorData();
 	void OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle, FGameplayTag ActivationTag);
