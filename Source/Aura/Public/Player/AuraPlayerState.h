@@ -21,10 +21,14 @@ class AURA_API AAuraPlayerState : public APlayerState, public IAbilitySystemInte
 public:
 	AAuraPlayerState();
 	
+	/* --<IAbilitySystemInterface>-- */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	/* <IAbilitySystemInterface> */
 	FORCEINLINE UAttributeSet* GetAttributeSet() const { return AttributeSet; };
 	
+	/* --<APlayerState>-- */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	/* <APlayerState> */
 	
 	FORCEINLINE int32 GetPlayerLevel() const{ return Level; }
 	

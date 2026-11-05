@@ -43,8 +43,6 @@ public:
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
 	
-protected:
-
 private:
 	static FAuraGameplayTags GameplayTags;
 };

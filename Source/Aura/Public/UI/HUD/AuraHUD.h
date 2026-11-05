@@ -28,7 +28,9 @@ public:
 	void InitOverlay(APlayerController* PC, UAbilitySystemComponent* ASC, APlayerState* PS, UAttributeSet* AS);
 
 protected:
+	/* --<AActor>-- */
 	virtual void BeginPlay() override;
+	/* <AActor> */
 	
 private:
 	UPROPERTY()

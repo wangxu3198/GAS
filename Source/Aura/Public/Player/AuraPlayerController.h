@@ -26,12 +26,18 @@ public:
 	AAuraPlayerController();
 	void AutoRun();
 
+	/* --<APlayerController>-- */
 	virtual void PlayerTick(float DeltaTime) override;
+	/* <APlayerController> */
 	
 protected:
+	/* --<AActor>-- */
 	virtual void BeginPlay() override;
+	/* <AActor> */
 	
+	/* --<APlayerController>-- */
 	virtual void SetupInputComponent() override;
+	/* <APlayerController> */
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
